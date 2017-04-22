@@ -19,10 +19,13 @@ import play.api._
 import play.api.mvc._
 import play.api.mvc.Results._
 import org.flywaydb.core.Flyway
-import org.flywaydb.core.api.MigrationInfo
+import org.flywaydb.core.api.{ MigrationInfo, MigrationVersion }
 import play.core._
 import java.io.FileNotFoundException
+import java.util.Properties
+
 import org.flywaydb.core.internal.util.jdbc.DriverDataSource
+
 import scala.collection.JavaConverters._
 
 class Plugin(implicit app: Application) extends play.api.Plugin
@@ -81,7 +84,7 @@ class Plugin(implicit app: Application) extends play.api.Plugin
       if migrationFileDirectoryExists(migrationFilesLocation)
     } yield {
       val flyway = new Flyway
-      flyway.setDataSource(new DriverDataSource(getClass.getClassLoader, configuration.driver, configuration.url, configuration.user, configuration.password))
+      flyway.setDataSource(new DriverDataSource(getClass.getClassLoader, configuration.driver, configuration.url, configuration.user, configuration.password, new Properties()))
       flyway.setLocations(migrationFilesLocation)
       flyway.setValidateOnMigrate(validateOnMigrate(dbName))
       flyway.setEncoding(encoding(dbName))
@@ -196,7 +199,7 @@ class Plugin(implicit app: Application) extends play.api.Plugin
       }
       case versionedInitPath(dbName, version) => {
 
-        flyways.get(dbName).foreach(_.setBaselineVersion(version))
+        flyways.get(dbName).foreach(_.setBaselineVersion(MigrationVersion.fromVersion(version)))
         flyways.get(dbName).foreach(_.baseline())
         Some(Redirect(getRedirectUrlFromRequest(request)))
       }

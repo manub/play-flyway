@@ -19,7 +19,7 @@ object ApplicationBuild extends Build {
       resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play" % play.core.PlayVersion.current % "provided",
-        "org.flywaydb" % "flyway-core" % "3.1",
+        "org.flywaydb" % "flyway-core" % "4.1.2",
         scalatest
       ),
       scalacOptions ++= Seq("-language:_", "-deprecation")
